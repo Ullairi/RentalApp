@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'RentalProject.urls'
+ROOT_URLCONF = 'RentalApp.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'RentalProject.wsgi.application'
+WSGI_APPLICATION = 'RentalApp.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -107,7 +107,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # Rate Limiting
+
+    # Rate Limit
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
@@ -128,9 +129,10 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+# Swagger
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Rental API',
-    'DESCRIPTION': 'API для системы аренды жилья',
+    'DESCRIPTION': 'API for house renting system',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
