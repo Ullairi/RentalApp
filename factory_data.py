@@ -17,7 +17,7 @@ from users.models import User, Favorite
 from listings.models import Address, Amenity, Listing
 from bookings.models import Booking, BookingStatusHistory
 from reviews.models import Review
-from core.enums import UserRole, Gender, HouseType, BookingStatus
+from core.enums import UserRole, Gender, HouseType, BookingStatus, Land
 
 faker_ = Faker()
 
@@ -46,8 +46,10 @@ class AddressFactory(factory.django.DjangoModelFactory):
 
     country = 'Germany'
     city = factory.Faker('city')
-    land = factory.LazyFunction(lambda: random.choice(['Bayern', 'Berlin', 'Hamburg', 'Hessen']))
+    land = factory.LazyFunction(lambda: random.choice([land.name for land in Land]))
     street = factory.Faker('street_name')
+    house_number = factory.LazyAttribute(lambda _: str(random.randint(1, 150)))
+    apartment_number = factory.LazyAttribute(lambda _: str(random.randint(1, 50)) if random.random() > 0.3 else '')
     postal_code = factory.LazyAttribute(lambda _: str(random.randint(10000, 99999)))
 
 

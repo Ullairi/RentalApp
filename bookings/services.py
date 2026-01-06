@@ -18,19 +18,15 @@ class BookingService:
         return listing.price_per_night * nights
 
     @staticmethod
-    def check_availability(listing, check_in, check_out, exclude_booking_id=None):
+    def check_availability(listing, check_in, check_out):
         """Checks if listing is available for chosen date"""
         overlapping = Booking.objects.filter(
             listing=listing,
-            book_status__in=[BookingStatus.pending.name, BookingStatus.confirmed.name]
-        ).filter(
-            Q(check_in__lt=check_out) & Q(check_out__gt=check_in)
-        )
-
-        if exclude_booking_id:
-            overlapping = overlapping.exclude(id=exclude_booking_id)
-
-        return not overlapping.exists()
+            book_status='confirmed',
+            check_in__lt=check_out,
+            check_out__gt=check_in
+        ).exists()
+        return not overlapping
 
     @staticmethod
     def create_booking(tenant, validated_data):

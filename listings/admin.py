@@ -5,9 +5,16 @@ from .models import Address, Amenity, Listing, ListingImg, SearchHistory, ViewHi
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     """Admin configuration for addresses"""
-    list_display = ['street', 'city', 'land', 'postal_code', 'country']
+    list_display = ['get_street', 'city', 'land', 'postal_code', 'country']
     search_fields = ['city', 'street', 'postal_code']
+    list_filter = ['land']
 
+    @admin.display(description='Street')
+    def get_street(self, obj):
+        addr = f'{obj.street} {obj.house_number}'
+        if obj.apartment_number:
+            addr += f', Apartment {obj.apartment_number}'
+        return addr
 
 @admin.register(Amenity)
 class AmenityAdmin(admin.ModelAdmin):
@@ -25,18 +32,33 @@ class ListingImageInline(admin.TabularInline):
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):
     """Admin config. for listings"""
-    list_display = ['title', 'owner', 'city_land', 'house_type', 'price_per_night', 'is_active', 'created_at']
+    list_display = ['title', 'owner', 'city_land', 'house_type', 'get_price', 'is_active', 'created_at']
     list_filter = ['house_type', 'is_active', 'created_at']
     search_fields = ['title', 'description', 'address__city']
     inlines = [ListingImageInline]
     filter_horizontal = ['amenities']
     readonly_fields = ['views_count', 'created_at', 'updated_at']
+    actions = ['activate_listings', 'deactivate_listings']
 
     @admin.display(description='Location')
     def city_land(self, obj):
         if obj.address:
             return f"{obj.address.city}, {obj.address.land}" if obj.address.land else obj.address.city
         return '-'
+
+    @admin.display(description='Price per night')
+    def get_price(self, obj):
+        return f"€{obj.price_per_night}"
+
+    @admin.action(description='Activate selected listings')
+    def activate_listings(self, request, queryset):
+        count = queryset.update(is_active=True)
+        self.message_user(request, f'{count} listing(s) activated')
+
+    @admin.action(description='Deactivate selected listings')
+    def deactivate_listings(self, request, queryset):
+        count = queryset.update(is_active=False)
+        self.message_user(request, f'{count} listing(s) deactivated')
 
 @admin.register(SearchHistory)
 class SearchHistoryAdmin(admin.ModelAdmin):

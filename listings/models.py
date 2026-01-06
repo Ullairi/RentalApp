@@ -1,7 +1,8 @@
 from django.db import models
 from core.mixins import TimestampMixin
-from core.enums import HouseType, AmenityCategory
-from core.validators import validate_positive_price, validate_positive_number
+from core.enums import HouseType, AmenityCategory, Land
+from core.validators import validate_positive_price, validate_positive_number, validate_no_digits, validate_postal_code, \
+    validate_apartment_number
 from django.db.models import Avg
 
 
@@ -24,26 +25,35 @@ class Amenity(TimestampMixin):
 class Address(TimestampMixin):
     """Model for listing address"""
     country = models.CharField(max_length=70, default='Germany')
-    city = models.CharField(max_length=70)
-    land = models.CharField(max_length=30, blank=True)
-    street = models.CharField(max_length=50)
-    postal_code = models.CharField(max_length=5)
+    city = models.CharField(max_length=70, validators=[validate_no_digits])
+    land = models.CharField(max_length=30, choices=Land.choices())
+    street = models.CharField(max_length=50, validators=[validate_no_digits])
+    house_number = models.CharField(max_length=10)
+    apartment_number = models.CharField(max_length=5, blank=True, validators=[validate_apartment_number])
+    postal_code = models.CharField(max_length=5, validators=[validate_postal_code])
 
     class Meta:
         db_table = 'addresses'
         verbose_name = 'Address'
         verbose_name_plural = "Addresses"
+        unique_together = ['street', 'house_number', 'apartment_number', 'city', 'postal_code']
         indexes = [
             models.Index(fields=['city']),
             models.Index(fields=['postal_code']),
         ]
 
     def __str__(self):
-        return f'{self.street}, {self.city}, {self.land}, {self.postal_code}'
+        addr = f'{self.street} {self.house_number}'
+        if self.apartment_number:
+            addr += f', Apartment {self.apartment_number}'
+        return f'{addr}, {self.city}, {self.postal_code}'
 
     @property
     def full_address(self):
-        parts = [self.street, self.city]
+        parts = [f'{self.street} {self.house_number}']
+        if self.apartment_number:
+            parts[0] += f', Apartment {self.apartment_number}'
+        parts.append(self.city)
         if self.land:
             parts.append(self.land)
         parts.append(self.postal_code)
@@ -51,8 +61,8 @@ class Address(TimestampMixin):
         return ', '.join(parts)
 
 class Listing(TimestampMixin):
-    """Model for listins creation"""
-    title = models.CharField(max_length=255)
+    """Model for listings creation"""
+    title = models.CharField(max_length=50)
     owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='listings')
     description = models.TextField()
     is_active = models.BooleanField(default=True)
@@ -63,7 +73,7 @@ class Listing(TimestampMixin):
     max_stayers = models.PositiveIntegerField(validators=[validate_positive_number])
     bedrooms = models.PositiveIntegerField(validators=[validate_positive_number])
     bathrooms = models.PositiveIntegerField(validators=[validate_positive_number])
-    price_per_night = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_positive_price])
+    price_per_night = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_positive_price], verbose_name='Price per night (€)')
 
     class Meta:
         db_table = 'listings'

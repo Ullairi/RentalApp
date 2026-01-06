@@ -34,6 +34,7 @@ class ReviewImg(TimestampMixin):
     """Review model for images"""
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='images')
     img = models.ImageField(upload_to='reviews/%Y/%m/%d/')
+    description = models.CharField(max_length=255, blank=True)
 
     class Meta:
         db_table = 'review_imgs'

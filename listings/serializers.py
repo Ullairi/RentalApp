@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Address, Listing, Amenity, ListingImg
+from core.enums import Land
 
 
 class AmenitySerializer(serializers.ModelSerializer):
@@ -13,12 +14,23 @@ class AmenitySerializer(serializers.ModelSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     """Serializer for listing address"""
     full_address = serializers.CharField(read_only=True)
+    land = serializers.ChoiceField(choices=Land.choices())
+    apartment_number = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Address
-        fields = ['id', 'country', 'city', 'land', 'street', 'postal_code', 'full_address', 'created_at']
+        fields = ['id', 'country', 'city', 'land', 'street', 'house_number', 'apartment_number', 'postal_code', 'full_address', 'created_at']
         read_only_fields = ['id', 'full_address', 'created_at']
 
+    def validated_city(self, value):
+        if any(char.isdigit() for char in value):
+            raise serializers.ValidationError('City cannot contain numbers')
+        return value
+
+    def validate_street(self, value):
+        if any(char.isdigit() for char in value):
+            raise serializers.ValidationError('Street cannot contain numbers')
+        return value
 
 class ListingImgSerializer(serializers.ModelSerializer):
     """Serializer for listings images"""
@@ -71,7 +83,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating and updating listings"""
     address = AddressSerializer()
     amenity_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
-    title = serializers.CharField(max_length=255, min_length=5)
+    title = serializers.CharField(max_length=50, min_length=5)
     description = serializers.CharField(max_length=5000, min_length=20)
     price_per_night = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=1, max_value=100000)
     bedrooms = serializers.IntegerField(min_value=1, max_value=50)

@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from core.enums import Gender, UserRole
 from core.mixins import TimestampMixin
+from core.validators import validate_no_digits
 
 
 class UserManager(BaseUserManager):
@@ -28,8 +29,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampMixin):
     """User model"""
-    username = models.CharField('Username', max_length=30, unique=True, blank=True)
-    email = models.EmailField('Email', unique=True)
+    username = models.CharField('Username', max_length=30, unique=True, blank=True, validators=[validate_no_digits])
+    email = models.EmailField('Email', max_length=40, unique=True)
     first_name = models.CharField('First name', max_length=40, blank=True)
     last_name = models.CharField('Last name', max_length=40, blank=True)
 

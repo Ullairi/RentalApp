@@ -67,3 +67,26 @@ class VerificationStatus(StrEnum):
     @classmethod
     def choices(cls):
         return [(verif_stat.name, verif_stat.value) for verif_stat in cls]
+
+class Land(StrEnum):
+    """German federal states"""
+    baden_wurttemberg = "Baden-Württemberg"
+    bayern = "Bayern"
+    berlin = "Berlin"
+    brandenburg = "Brandenburg"
+    bremen = "Bremen"
+    hamburg = "Hamburg"
+    hessen = "Hessen"
+    mecklenburg_vorpommern = "Mecklenburg-Vorpommern"
+    niedersachsen = "Niedersachsen"
+    nordrhein_westfalen = "Nordrhein-Westfalen"
+    rheinland_pfalz = "Rheinland-Pfalz"
+    saarland = "Saarland"
+    sachsen = "Sachsen"
+    sachsen_anhalt = "Sachsen-Anhalt"
+    schleswig_holstein = "Schleswig-Holstein"
+    thuringen = "Thüringen"
+
+    @classmethod
+    def choices(cls):
+        return [(land.name, land.value) for land in cls]

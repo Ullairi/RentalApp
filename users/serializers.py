@@ -39,6 +39,21 @@ class UserSerializer(serializers.ModelSerializer):
             })
         return data
 
+    def validate_first_name(self, value):
+        if value and any(char.isdigit() for char in value):
+            raise serializers.ValidationError('Name cannot contain numbers')
+        return value
+
+    def validate_last_name(self, value):
+        if value and any(char.isdigit() for char in value):
+            raise serializers.ValidationError('Name cannot contain numbers')
+        return value
+
+    def validate_username(self, value):
+        if any(char.isdigit() for char in value):
+            raise serializers.ValidationError('Username cannot contain numbers')
+        return value
+
 
 class LoginSerializer(serializers.Serializer):
     """Serializer for user login"""

@@ -24,3 +24,18 @@ def validate_rating(value):
     """Validation that rating in range 1-5"""
     if value < 1 or value > 5:
         raise ValidationError('Rating must be in range between 1-5', code='invalid_rating')
+
+def validate_no_digits(value):
+    """Validation that value contains no digits"""
+    if any(char.isdigit() for char in value):
+        raise ValidationError('This field cannot contain numbers', code='contains_digits')
+
+def validate_postal_code(value):
+    """Validation that postal code is exactly 5 digits"""
+    if not (value.isdigit() and len(value) == 5):
+        raise ValidationError('Postal code must be exactly 5 digits', code='invalid_postal_code')
+
+def validate_apartment_number(value):
+    """Validation that apartment number contains only digits"""
+    if value and not value.isdigit():
+        raise ValidationError('Apartment number must contain only digits', code='invalid_apartment_number')

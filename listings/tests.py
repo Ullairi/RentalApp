@@ -18,7 +18,9 @@ class ListingModelTest(TestCase):
         self.address = Address.objects.create(
             country="Germany",
             city="Berlin",
+            land="berlin",
             street="Test Street",
+            house_number="10",
             postal_code="12345"
         )
 
@@ -57,7 +59,9 @@ class ListingListViewTest(APITestCase):
         self.address = Address.objects.create(
             country="Germany",
             city="Berlin",
+            land="berlin",
             street="Test Street",
+            house_number="10",
             postal_code="12345"
         )
         self.listing = Listing.objects.create(
@@ -88,7 +92,10 @@ class ListingListViewTest(APITestCase):
             "address": {
                 "country": "Germany",
                 "city": "Munich",
+                "land": "bayern",
                 "street": "Main Street",
+                "house_number": "15",
+                "apartment_number": "",
                 "postal_code": "80331"
             },
             "price_per_night": "150.00",
@@ -110,7 +117,9 @@ class ListingListViewTest(APITestCase):
             "address": {
                 "country": "Germany",
                 "city": "Munich",
+                "land": "bayern",
                 "street": "Main Street",
+                "house_number": "20",
                 "postal_code": "80331"
             },
             "price_per_night": "150.00",
@@ -141,7 +150,9 @@ class ListingDetailViewTest(APITestCase):
         self.address = Address.objects.create(
             country="Germany",
             city="Berlin",
+            land="berlin",
             street="Test Street",
+            house_number="10",
             postal_code="12345"
         )
         self.listing = Listing.objects.create(
@@ -177,7 +188,7 @@ class ListingDetailViewTest(APITestCase):
         url = reverse("listing-manage", args=[self.listing.id])
         data = {"title": "Hacked Title"}
         response = self.client.patch(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # queryset filtered
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_listing_owner(self):
         """Test owner can delete their listing"""
@@ -205,7 +216,9 @@ class ListingHistoryTest(APITestCase):
         self.address = Address.objects.create(
             country="Germany",
             city="Berlin",
+            land="berlin",
             street="Test Street",
+            house_number="10",
             postal_code="12345"
         )
         self.listing = Listing.objects.create(
@@ -239,3 +252,7 @@ class ListingHistoryTest(APITestCase):
         url = reverse("popular-listings")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+#Vovan@gmail.com
+#zxcvovazxc123

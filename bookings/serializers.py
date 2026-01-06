@@ -3,6 +3,8 @@ from django.utils import timezone
 from .models import Booking, BookingStatusHistory
 from listings.serializers import ListingSerializer
 from users.serializers import UserProfileSerializer
+from listings.models import Listing
+from bookings.services import BookingService
 
 
 class BookingStatusHistorySerializer(serializers.ModelSerializer):
@@ -60,17 +62,25 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         if data['check_in'] < timezone.now().date():
             raise serializers.ValidationError({'check_in': 'Check-in cannot be in the past'})
 
+        if data['check_out'] <= timezone.now().date():
+            raise serializers.ValidationError({'check_out': 'Check-out must be in the future'})
+
         nights = (data['check_out'] - data['check_in']).days
         if nights > 365:
             raise serializers.ValidationError({'check_out': 'Maximum booking length is 365 days'})
 
-        from listings.models import Listing
         try:
             listing = Listing.objects.get(id=data['listing_id'], is_active=True)
             if data['stayers'] > listing.max_stayers:
                 raise serializers.ValidationError({
                     'stayers': f'Maximum {listing.max_stayers} guests allowed'
                 })
+
+            if not BookingService.check_availability(listing, data['check_in'], data['check_out']):
+                raise serializers.ValidationError({
+                    'check_in': 'These dates are not available'
+                })
+
         except Listing.DoesNotExist:
             raise serializers.ValidationError({'listing_id': 'Listing not found or inactive'})
 
