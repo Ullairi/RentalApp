@@ -19,6 +19,9 @@ class UserSerializer(serializers.ModelSerializer):
         default='tenant'
     )
 
+    first_name = serializers.CharField(required=True, min_length=2, max_length=40)  # ДОБАВЬ
+    last_name = serializers.CharField(required=True, min_length=2, max_length=40)
+
     class Meta:
         model = User
         fields = [
