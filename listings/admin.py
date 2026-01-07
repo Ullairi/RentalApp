@@ -33,7 +33,8 @@ class ListingImageInline(admin.TabularInline):
 class ListingAdmin(admin.ModelAdmin):
     """Admin config. for listings"""
     list_display = ['title', 'owner', 'city_land', 'house_type', 'get_price', 'is_active', 'created_at']
-    list_filter = ['house_type', 'is_active', 'created_at']
+    list_filter = ['house_type', 'is_active', 'created_at', 'address__land']
+    date_hierarchy = 'created_at'
     search_fields = ['title', 'description', 'address__city']
     inlines = [ListingImageInline]
     filter_horizontal = ['amenities']

@@ -25,6 +25,16 @@ class ListingListView(ListAPIView):
     serializer_class = ListingSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'house_type': ['exact'],
+        'bedrooms': ['exact', 'gte', 'lte'],
+        'bathrooms': ['exact', 'gte', 'lte'],
+        'max_stayers': ['gte', 'lte'],
+        'price_per_night': ['gte', 'lte'],
+        'address__city': ['exact', 'icontains'],
+        'address__land': ['exact'],
+    }
+    search_fields = ['title', 'description', 'address__city']
     ordering_fields = ['price_per_night', 'created_at', 'views_count']
     ordering = ['-created_at']
 
